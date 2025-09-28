@@ -1,9 +1,11 @@
 <script>
 import ItemCard from './ItemCard.vue';
+import ItemEditor from './ItemEditor.vue';
 
 export default {
   components: {
-    ItemCard
+    ItemCard,
+    ItemEditor
   },
   data() {
     return {
@@ -13,7 +15,10 @@ export default {
         {title: "Карточка 3", description: "Описание карточки 3"}
       ], 
       sumClick: 0,
-      maxId: 3
+      maxId: 3,
+      editingIndex: null,
+      editingDraft: null,
+      showEditor: false
     }
   },
   computed: {
@@ -37,6 +42,23 @@ export default {
     },
     delItem (index) {        
         this.items.splice(index,1)
+    },
+    openEditor(index) {
+        this.editingIndex = index
+        this.editingDraft = { title: this.items[index].title, description: this.items[index].description }
+        this.showEditor = true
+    },
+    saveEdit(updated) {
+        const i = this.editingIndex
+        if (i != null) {
+          this.items[i] = { ...this.items[i], ...updated } // обновляем title/description, сохраняем count
+        }
+        this.closeEditor()
+    },
+    closeEditor() {
+        this.showEditor = false
+        this.editingIndex = null
+        this.editingDraft = null
     }
   }
 }
@@ -44,11 +66,20 @@ export default {
 
 <template>
   <div class="item-list">
-    <button @click="addItem" class="add-btn">Добавить карточку</button>
-    <button @click="delAll" class="del-btn">Удалить все</button>
+    <button @click="addItem" class="btn">Добавить карточку</button>
+    <button @click="delAll" class="btn">Удалить все</button>
     <p>Кол-во карточек: {{ countCard }}</p>
     <p>Кол-во кликов по карточкам всего: {{ sumClick }}</p>
     <p>Список карточек:</p>
+    
+    <div v-if="showEditor" class="modal">
+      <ItemEditor
+        :model-value="editingDraft"
+        @save="saveEdit"
+        @cancel="closeEditor"
+      />
+    </div>
+
     <ItemCard
       v-for="(item, index) in items"
       :key="index"
@@ -56,16 +87,23 @@ export default {
       :description="item.description"
       @clicked="incrementSum"     
       @removeItem="delItem(index)"
-      
+      @edit="openEditor(index)"      
     />
   </div>
+
 </template>
 
-<style>
-.item-list {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-left: 30px;
-}
+<style scoped>
+  .item-list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 30px;
+  }
+
+  .btn {
+      width: 150px;
+      height: 30px;
+      margin-top: 10px;
+  } 
 </style>

@@ -16,7 +16,11 @@ export default{
         },
         removeItem() {
             this.$emit("removeItem");            
+        },
+        edit() {
+            this.$emit('edit');
         }
+
     }   
 }
 </script>
@@ -27,9 +31,12 @@ export default{
             <h3 class="card__title">Название: {{ title }}</h3>
             <p class="card__decs">Описание: {{ description }}</p>
             <p class="count__click">Кол-во кликов: {{ count }}</p>
-            <button class="card__btn" @click="increment">Клик</button>
+            <button class="btn" @click="increment">Клик</button>
         </div>
-        <button class="card__btn__del" @click="removeItem">Удалить</button>
+        <div class="actions">
+             <button class="btn" @click="removeItem">Удалить</button>
+             <button class="btn" @click="edit">Редактировать</button>
+        </div>   
     </div>
 </template>
 
@@ -47,13 +54,14 @@ export default{
     padding: 20px;
 }
 
-.card__btn {
-    width: 100px;
-    height: 30px;
+.actions {
+    display:flex;
+    flex-direction: column;
 }
 
-.card__btn__del {
+.btn {
     width: 100px;
     height: 30px;
+    margin-top: 10px;
 }
 </style>
